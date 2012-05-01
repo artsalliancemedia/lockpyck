@@ -3,10 +3,12 @@ API client for the Locksmith KDM service
 """
 
 import os
+import os.path
 import urllib
 import urllib2
 import json
 import fnmatch
+import re
 
 LOCKSMITH_HOST = 'https://locksmith.artsalliancemedia.com'
 
@@ -27,7 +29,7 @@ class AuthorisationError(Exception):
     pass
 
 
-class Lockpick(object):
+class Lockpyck(object):
     """
     Locksmith wrapper class for encapsulating communication with
     the Locksmith service
@@ -48,7 +50,7 @@ class Lockpick(object):
         if response.code == 200:
             return json.loads(response.read())['version']
 
-    def get_kdm(self, kdm_uuid):
+    def kdm(self, kdm_uuid):
         """
         Returns a dictionary of a KDM and its metadata from a UUID.
         If no KDM is found, then an empty dictionary is returned.
@@ -57,21 +59,38 @@ class Lockpick(object):
         if response.code == 200:
             return json.loads(response.read())
 
+    def kdms_from_thumbprint(self, thumbprint):
+        """
+        Returns a list of KDM dictionaries who are both not expired and match to the
+        given thumbprint
+        """
+        response = self.url_opener.open(self._host + '/api/kdm/thumbprint/' + thumbprint)
+        if response.code == 200:
+            return json.loads(response.read())
+
+    def kdm_bundle(self, cpl_uuid, thumbprint, save_path=None):
+	"""
+	Retrieves a KDM bundle for the specified CPL and server thumbprint
+	and saves it to the specified location if one is specified, otherwise
+	return the filename and tar data as a tuple
+	"""
+        response = self.url_opener.open(self._host + '/api/tkr/' + cpl_uuid + '/' + thumbprint)
+	if response.code == 200:
+	    # Get the filename from the HTML headers
+	    p = re.compile('attachment; filename="(.*)"')
+	    filename = p.match(response.info().getheader('Content-Disposition')).group(1)
+	    if save_path:
+	        with open(os.path.join(save_path, filename), 'w') as f:
+	            f.write(response.read())
+	    else:
+		return (filename, response.read())
+
     def save_kdm(self, kdm_xml):
         """
         Uploads a KDM to Locksmith
         """
         data = urllib.urlencode({'kdm' : kdm_xml})
         response = self.url_opener.open(self._host + '/api/kdm/save/', data)
-        if response.code == 200:
-            return json.loads(response.read())
-
-    def get_kdms_from_thumbprint(self, thumbprint):
-        """
-        Returns a list of KDM dictionaries who are both not expired and match to the
-        given thumbprint
-        """
-        response = self.url_opener.open(self._host + '/api/kdm/thumbprint/' + thumbprint)
         if response.code == 200:
             return json.loads(response.read())
 

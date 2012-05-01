@@ -1,0 +1,5 @@
+# Private client file
+lockpyck_private.py
+
+# Python compiled files
+*.pyc
