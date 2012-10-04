@@ -1,6 +1,7 @@
 """
 Unit tests for the Lockpick client module
 """
+import sys
 import unittest
 
 from lockpyck import Lockpyck
@@ -265,14 +266,14 @@ C7Fa0KtH0mnRwmZZKW/8vPOIeffauUs2BVVGz/K6Xvk1XWPz2O34IfGIC8r9
 
 class TestLockpick(unittest.TestCase):
     """
-        Units tests for the Lockpick Python client
-        """
+    Units tests for the Lockpick Python client
+    """
     
     def setUp(self):
         self.lockpyck = Lockpyck(_TESTUSER, _TESTPASS, _TESTHOST)
     
     def test_version(self):
-        self.assertTrue(self.lockpyck.version == 0.01)
+        self.assertTrue(self.lockpyck.version == '0.0.1')
     
     def test_kdm(self):
         kdm = self.lockpyck.kdm('daf5f223-5924-4a43-8f3b-e34a0b13f4b4')
@@ -286,21 +287,21 @@ class TestLockpick(unittest.TestCase):
         result = self.lockpyck.save_kdm(_TESTKDM)
         self.assertTrue(not 'errors' in result.keys())
         self.assertEqual(result['message'], 'Saved KDM')
-	kdm = self.lockpyck.kdm('4a8c103c-8d55-4cea-b665-b08d8053e576')
-	self.assertEqual(kdm['xml'], _TESTKDM)
+        kdm = self.lockpyck.kdm('4a8c103c-8d55-4cea-b665-b08d8053e576')
+        self.assertEqual(kdm['xml'], _TESTKDM)
 
     def test_kdms_from_thumbprint(self):
         kdms = self.lockpyck.kdms_from_thumbprint('Gio9Szty8daEiFpFUVMv2uiackk=')
         self.assertTrue(len(kdms))
 
     def test_kdm_bundle(self):
-	# Add the test KDM
+        # Add the test KDM
         self.lockpyck.save_kdm(_TESTKDM)
-	# Retrieve the bundle
-	filename, tarball = self.lockpyck.kdm_bundle('6b3f9ef8-f9c4-42b9-aff0-645cb0b11e06',
-			                             '1a2a3d4b3b72f1d684885a4551532fdae89a7249')
-	self.assertEqual(filename, 'KDMb-6b3f9ef8-f9c4-42b9-aff0-645cb0b11e06.tar')
-	self.assertTrue(tarball.find('<AnnotationText language="en">Locksmith KDM Bundle</AnnotationText>') != -1)
+        # Retrieve the bundle
+        filename, tarball = self.lockpyck.kdm_bundle('6b3f9ef8-f9c4-42b9-aff0-645cb0b11e06',
+                                                       '1a2a3d4b3b72f1d684885a4551532fdae89a7249')
+        self.assertEqual(filename, 'KDMb-6b3f9ef8-f9c4-42b9-aff0-645cb0b11e06.tar')
+        self.assertTrue(tarball.find('<AnnotationText language="en">Locksmith KDM Bundle</AnnotationText>') != -1)
 
 if __name__ == '__main__':
     unittest.main()
