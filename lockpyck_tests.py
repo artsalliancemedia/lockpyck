@@ -7,9 +7,9 @@ import unittest
 from lockpyck import Lockpyck
 
 # For unit testing only; this user doesn't exist in production. Seriously, don't even bother trying ...
-_TESTHOST = 'https://localhost:3001'
-_TESTUSER = 'test'
-_TESTPASS = 'test'
+_TESTHOST = 'https://test_url'
+_TESTUSER = 'testusr'
+_TESTPASS = 'testpass'
         
 # Test XML
 
@@ -278,9 +278,11 @@ class TestLockpick(unittest.TestCase):
     def test_kdm(self):
         kdm = self.lockpyck.kdm('daf5f223-5924-4a43-8f3b-e34a0b13f4b4')
         for k in kdm.keys():
-            self.assertTrue(k in ('id', 'text', 'subject', 'valid_from', 'valid_to', 'cpl_id', 'cpl_text', 'xml', 'status', 'user', 'signer',))
+            self.assertTrue(k in ('id', 'text', 'subject', 'valid_from', 'valid_to', 'delivery',
+                                  'cpl_id', 'cpl_text', 'xml', 'status', 'user', 'signer',))
         for k in kdm['subject'].keys():
-            self.assertTrue(k in ('thumbprint', 'name', 'org', 'unit',))
+            self.assertTrue(k in ('thumbprint', 'name', 'org', 'unit', 'screen_number',
+                                  'facility_name', 'facility_id', 'circuit'))
         self.assertEqual(kdm['subject']['thumbprint'], 'dCxHtnikb+RSfBAuRkIVqPxaY4I=')
     
     def test_save_kdm(self):

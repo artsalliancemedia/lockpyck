@@ -90,7 +90,7 @@ class Lockpyck(object):
         Returns a list of KDM dictionaries who are both not expired and match to the
         given thumbprint
         """
-        response = request(self._host + '/api/kdm/thumbprint/' + thumbprint, (self._username, self._passwd))
+        response = request(self._host + '/api/kdm?thumbprint=' + thumbprint, (self._username, self._passwd))
         # response = self.url_opener.open(self._host + '/api/kdm/thumbprint/' + thumbprint)
         if response.code == 200:
             return json.loads(response.read())
